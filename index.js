@@ -1,7 +1,6 @@
 require("update-electron-app")();
 
 const { menubar } = require("menubar");
-const Nucleus = require("nucleus-analytics");
 
 const path = require("path");
 const {
@@ -19,8 +18,6 @@ const image = nativeImage.createFromPath(
 );
 
 app.on("ready", () => {
-  Nucleus.init("638d9ccf4a5ed2dae43ce122");
-
   const tray = new Tray(image);
 
   const mb = menubar({
@@ -29,10 +26,9 @@ app.on("ready", () => {
       transparent: path.join(__dirname, `images/iconApp.png`),
       webPreferences: {
         webviewTag: true,
-        // nativeWindowOpen: true,
       },
-      width: 450,
-      height: 550,
+      width: 980,
+      height: 650,
     },
     tray,
     showOnAllWorkspaces: true,
@@ -43,7 +39,6 @@ app.on("ready", () => {
 
   mb.on("ready", () => {
     const { window } = mb;
-
 
     if (process.platform !== "darwin") {
       window.setSkipTaskbar(true);
@@ -126,6 +121,7 @@ app.on("ready", () => {
     if (contents.getType() == "webview") {
       // open link with external browser in webview
       contents.on("new-window", (e, url) => {
+        console.log("e is", e);
         e.preventDefault();
         shell.openExternal(url);
       });
@@ -138,6 +134,15 @@ app.on("ready", () => {
       // register cmd+c/cmd+v events
       contents.on("before-input-event", (event, input) => {
         const { control, meta, key } = input;
+
+        if (input.type !== "keyDown" && key == "Enter") {
+          console.log('enter pressed');
+          // press main > form > button
+          contents.executeJavaScript(
+            `document.querySelector('main form button').click()`
+          );
+        }
+
         if (!control && !meta) return;
         if (key === "c") contents.copy();
         if (key === "v") contents.paste();
