@@ -136,6 +136,9 @@ app.on("ready", () => {
         const { control, meta, key } = input;
 
         if (input.type !== "keyDown" && key == "Enter") {
+          // if shift is also pressed, ignore
+          if (input.shift) return;
+
           console.log('enter pressed');
           // press main > form > button
           contents.executeJavaScript(
@@ -144,6 +147,7 @@ app.on("ready", () => {
         }
 
         if (!control && !meta) return;
+        if (key === "x") contents.cut();
         if (key === "c") contents.copy();
         if (key === "v") contents.paste();
         if (key === "a") contents.selectAll();
